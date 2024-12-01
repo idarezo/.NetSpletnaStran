@@ -1,0 +1,33 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    background-color: #f2f2f2; 
+    font-family: "Roboto", sans-serif;
+}
+
+
+
+#navBarMain {
+    background-color: #c5d8e9; 
+}
+
+.customisedDivs {
+    background-color: #c5d8e9; 
+}
+
+
+

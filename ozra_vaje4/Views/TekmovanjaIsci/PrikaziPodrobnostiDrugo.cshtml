@@ -1,0 +1,114 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model TekmovanjeDrugoViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment Pool</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h3>@Localizer["ena"]:</h3>
+        <h4>@(Model.ime_tekmovanja + " " + Model.drzava)</h4>
+
+        <div class="card">
+            <div class="card-header">
+                @Localizer["dva"]  
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <input type="hidden" id="imeTek" value="@Model.ime_tekmovanja" />
+                    <input type="hidden" id="drzava" value="@Model.drzava" />
+                    <input type="hidden" id="leto" value="@Model.leto_izvedbe" />
+                    <label for="comment">@Localizer["sest"]:</label>
+                    <textarea placeholder="@Localizer["sedem"]" class="form-control" id="comment" rows="3"></textarea>
+                </div>
+                <button id="btnAddComment" class="btn btn-primary">@Localizer["tri"]</button>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h4>@Localizer["stiri"]:</h4>
+            <button id="toggleCommentsBtn" class="btn btn-info mb-3">@Localizer["pet"]</button>
+            <div id="commentsSection">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("#toggleCommentsBtn").click(function () {
+                var tekmovanjeIme = $("#imeTek").val();
+                var tekmovanjeDrzava = $("#drzava").val();
+                var tekmovanjeLetoIzvedbe = $("#leto").val();
+
+                var idTekmovanje = tekmovanjeIme + tekmovanjeDrzava + tekmovanjeLetoIzvedbe;
+
+                $.ajax({
+                    url: "/Tekmovanja/pridobiKomentar/" + idTekmovanje,
+                    method: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        $("#commentsSection").empty();
+                        $.each(response, function (index, item) {
+                            var commentDiv = $("<div>").addClass("rounded p-3 mb-3 border");
+
+                            var commentParagraph = $("<p>").text(item.commentText).css("font-style", "italic");
+
+                            commentDiv.append(commentParagraph);
+
+
+
+                            $("#commentsSection").append(commentDiv);
+                        });
+
+
+
+
+                        console.log("Success:", response);
+                    },
+                    error: function (xhr, status, error) {
+
+                        console.error("Error:", error);
+                    }
+                });
+            });
+
+            $("#btnAddComment").click(function () {
+
+                var tekmovanjeIme = $("#imeTek").val();
+                var tekmovanjeDrzava = $("#drzava").val();
+                var tekmovanjeLetoIzvedbe = $("#leto").val();
+
+                var idTekmovanje = tekmovanjeIme + tekmovanjeDrzava + tekmovanjeLetoIzvedbe;
+                var komentar = $("#comment").val();
+
+                $.ajax({
+                    url: "/Tekmovanja/komentarNovi/" + idTekmovanje + "/" + komentar,
+                    method: "GET",
+                    dataType: "json",
+                    success: function (response) {
+
+                        $("#comment").val('');
+                        console.log("Success:", response);
+                    },
+                    error: function (xhr, status, error) {
+
+                        console.error("Error:", error);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

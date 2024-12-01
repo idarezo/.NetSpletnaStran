@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Registracija";
+
+}
+
+
+@model ozra_vaje4.Models.UserViewModel
+<head>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+     <style>
+        .form-container {
+            border: 3px solid #add8e6; 
+            border-radius: 5px; 
+            padding: 20px; 
+            border-radius: 10px; 
+        }
+    </style>
+
+</head>
+<h1>@ViewData["Title"]</h1>
+
+<div class="form-container">
+
+<form id="registrationForm" method="post" asp-controller="Posodobi" asp-action="posodobiPodatke" class="customisedDivs">
+    <div>
+
+        <div class="form-group">
+            <label asp-for="ime" for="imeInput">Ime:</label>
+            @Html.EditorFor(model => model.ime , new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="ime" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="priimek" for="priimekExample">Priimek:</label>
+            @Html.EditorFor(model => model.priimek , new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="priimek" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="eNaslov" class="control-label">Vnesite e-naslov:</label>
+            @Html.EditorFor(model => model.eNaslov , new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="eNaslov" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="geslo1" class="control-label">Ponovno vpišite geslo:</label>
+            @Html.EditorFor(model => model.geslo1 , new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="geslo1" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="geslo2" class="control-label">Ponovno vpišite geslo:</label>
+            @Html.EditorFor(model => model.geslo2, new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="geslo2" class="text-danger"></span>
+        </div>
+        <br />
+        <input type="submit" value="Posodobi" class="btn btn-primary" />
+    </div>
+
+
+</form>
+</div>

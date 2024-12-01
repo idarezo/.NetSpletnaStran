@@ -1,0 +1,164 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Vsa tekmovanja";
+}
+<script>
+    var localizedStrings = {
+        vsa: "@Localizer["VsaTekmovanja"]",
+        hide: "@Localizer["hide"]",
+        vsaDva: "@Localizer["VsaTekmovanjaDva"]",
+        hideDva: "@Localizer["hideDva"]",
+        letoIzvedbe: "@Localizer["LetoIzvedbeTekmovanja"]",
+        text2: "@Localizer["text2"]",
+        drzava: "@Localizer["drzavaTek"]"
+
+    };
+</script>
+@model IEnumerable<TekmovanjeViewModel>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vsa različna tekmovanja:</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+   
+</head>
+<body>
+    <br />
+
+ 
+    <div>
+        <h2 class="text-decoration-underline">@Localizer["Vsa"]:</h2>
+
+    </div>
+
+    <div id="test">
+    <div class="row">
+        <div id="test5" class="col-md-6 ">
+            <h4>IM/IM07:</h4>
+
+                <button class="btn btn-primary mb-3" id="fetchDataBtn">@Localizer["VsaTekmovanja"] </button>
+
+                <button class="btn btn-danger mb-3 hidden" id="hideDataBtn" style="display: none;">@Localizer["hide"]</button>
+            <div id="resultContainer">
+            </div>
+
+            </div>
+
+           <div class="col-md-6">
+
+            <h4>DOUBLE/TRIPLE:</h4>
+                <button class="btn btn-primary mb-3" id="fetchDataBtnDrugo">@Localizer["VsaTekmovanjaDva"]</button>
+                <button class="btn btn-danger mb-3 hidden" id="hideDataBtnDrugo" style="display: none;">@Localizer["hideDva"]</button>
+            <div id="resultContainerDrugo">
+             
+            </div>
+            </div>
+    </div>
+    </div>
+    
+
+    
+
+    <script>
+        $(document).ready(function () {
+
+            $("#fetchDataBtn").click(function () {
+                $("#hideDataBtn").show();
+
+                $.ajax({
+                    url: "/Tekmovanja/all",
+                    type: "GET",
+                    success: function (data) {
+                        console.log("Data fetched:", data);
+                        $("#resultContainer").empty();
+
+                        $.each(data, function (index, item) {
+                            var anchor = $("<a>").attr("href", "/Tekmovanja/komentar/" + item.ime_tekmovanja + "/" + item.drzava + "/" + item.leto_izvedbe);
+                            var heading = $("<h3>").text(item.ime_tekmovanja);
+                            var paragraph = $("<p>").text(localizedStrings.drzava + "  " + item.drzava);
+                            var paragraph2 = $("<p>").text(localizedStrings.letoIzvedbe +" " + item.leto_izvedbe);
+                            var btn = $("<button>").text(localizedStrings.text2).addClass("btn btn-primary").attr("id", "customBtn_" + index);
+
+
+                            var divNovi = $("<div>").addClass("border rounded p-3 mb-3 customisedDivs");
+                            anchor.append(heading);
+
+                            divNovi.append(anchor, paragraph, paragraph2,btn);
+
+                            $("#resultContainer").append(divNovi);
+                        });
+
+                        console.log("success..");
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+
+         
+
+
+
+            $("#resultContainer").on("click", "button", function () {
+                console.log("Button with id " + $(this).attr("id") + " clicked.");
+               
+                });
+
+            $("#hideDataBtn").click(function () {
+                $("#resultContainer").empty();
+                $(this).hide();
+            });
+
+            $("#fetchDataBtnDrugo").click(function () {
+                $("#hideDataBtnDrugo").show();
+
+                $.ajax({
+                    url: "/Tekmovanja/allDrugo",
+                    type: "GET",
+                    success: function (data) {
+                        console.log("Data fetched:", data);
+                        $("#resultContainerDrugo").empty();
+
+                        $.each(data, function (index, item) {
+                            var anchor = $("<a>").attr("href", "/Tekmovanja/komentarDrugoTekmovanje/" + item.ime_tekmovanja + "/" + item.drzava + "/" + item.leto_izvedbe);
+                            var heading = $("<h3>").text(item.ime_tekmovanja);
+                            var paragraph = $("<p>").text(localizedStrings.drzava + " : " + item.drzava);
+                            var paragraph2 = $("<p>").text(localizedStrings.letoIzvedbe + " " + item.leto_izvedbe);
+                            var btn = $("<button>").text(localizedStrings.text2).addClass("btn btn-primary").attr("id", "customBtn_" + index);
+
+
+                            var divNovi = $("<div>").addClass("border rounded p-3 mb-3 customisedDivs");
+                            anchor.append(heading);
+
+                            divNovi.append(anchor, paragraph, paragraph2,btn);
+
+                            $("#resultContainerDrugo").append(divNovi);
+                        });
+
+                        console.log("success..");
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+
+            $("#hideDataBtnDrugo").click(function () {
+                $("#resultContainerDrugo").empty();
+                $(this).hide();
+            });
+        });
+    </script>
+
+</>
+</body>
+</html>

@@ -1,0 +1,146 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<head>
+    <title>Vsa različna tekmovanja:</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script>
+        var localizedStrings = {
+            mesta: "@Localizer["mesto"]",
+            obvestilo: "@Localizer["obv"]"
+           
+
+        };
+    </script>
+    <style>
+        .test {
+            border: 2px solid #add8e6;
+            border-radius: 5px;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top:3px;
+        }
+    </style>  
+</head>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <h3><i>@Localizer["ime"] </i></h3>
+        <div id="customIdForm" class="test">
+            <div class="form-group">
+                <label for="input1">@Localizer["imeDva"]</label>
+                <input type="text" class="form-control" id="input1" placeholder="@Localizer["imeTri"]">
+            </div>
+            <div class="form-group">
+                <label for="input2">@Localizer["drzava"]:</label>
+                <input type="text" class="form-control" id="input2" placeholder="@Localizer["imeStiri"]">
+            </div>
+            <div class="form-group">
+                <label for="input3">@Localizer["letoIzvedbe"]:</label>
+                <input type="text" class="form-control" id="input3" placeholder="@Localizer["imePet"]">
+            </div>
+           
+            <button id="submitBtnIzracunRez" class="btn btn-primary">@Localizer["imeSest"]</button>
+        </div>
+        
+
+
+    </div>
+
+    <div class="col-md-6 mt-2" >
+        <p>@Localizer["imeSedem"]:</p>
+        <div id="podrobnostiContainer" class="test">
+        </div>
+
+    </div>
+
+    
+</div>
+
+   
+
+
+<script>
+    $(document).ready(function () {
+        $("#submitBtnIzracunRez").click(function () {
+            var test1 = $("#input1").val();
+            var test2 = $("#input2").val();
+            var test3 = $("#input3").val();
+            if (test1 == "" || test2 == "" || test3 == "") {
+                alert(localizedStrings.obvestilo);
+            }
+            var cacheBuster = new Date().getTime();
+
+            $.ajax({
+                url: "/Tekmovanja/TekmovanjaRezultati/" + test1 + "/" + test3 + "/" + test2 + "?_=" + cacheBuster,
+                type: "GET",
+                success: function (data) {
+                    console.log("Data fetched:", data);
+                    displayNames(data); 
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data:", error);
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+
+        function displayNames(data) {
+            var resultContainer = $("#podrobnostiContainer");
+            resultContainer.empty();
+            var rezultatiArray = data.rezultati;
+
+            
+            if (Array.isArray(rezultatiArray) && rezultatiArray.length > 0) {
+              
+                if (rezultatiArray[0] && 'name' in rezultatiArray[0]) {
+                    var rankingPosition = 1;
+
+                    rezultatiArray.forEach(function (item) {
+                        if (item && item.name) {
+                            var name = item.name;
+                            var heading = $("<h3>").text(name);
+                            var paragraph = $("<p>").text(localizedStrings.mesta + " : " + rankingPosition);
+
+                            var divNovi = $("<div>").addClass("border rounded p-3 mb-3 customisedDivs");
+                            divNovi.append(heading, paragraph);
+
+                            resultContainer.append(divNovi);
+                            rankingPosition++;
+                        } else {
+                            console.error("Item is missing required properties:", item);
+                        }
+                    });
+                } else {
+                    var rankingPosition = 1;
+                    rezultatiArray.forEach(function (item) {
+
+                        var title = item.overall;
+                        console.log(title);
+                         
+                            var heading = $("<h3>").text(title);
+                        var paragraph = $("<p>").text(localizedStrings.mesta + " : " + rankingPosition);
+
+                            var divNovi = $("<div>").addClass("border rounded p-3 mb-3 customisedDivs");
+                            divNovi.append(heading, paragraph);
+
+                            resultContainer.append(divNovi);
+                           rankingPosition++;
+
+                       
+                    });
+                }
+            } else {
+                var noDataElement = $("<p>").addClass("alert alert-warning").text("No data available");
+                resultContainer.append(noDataElement);
+            }
+        }
+
+
+        
+    });
+</script>

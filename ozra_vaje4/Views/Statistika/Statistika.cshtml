@@ -1,0 +1,298 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centered Form with Buttons</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    var localizedStrings = {
+            obvestilo: "@Localizer["obv"]",
+            stPonovitev: "@Localizer["pon"]"
+           
+
+        };
+    </script>
+    <style>
+        .bordered {
+            border: 1px solid #add8e6;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+
+                <div>
+                    <h4>@Localizer["bar"]:</h4>
+                    <p class="em">@Localizer["stPon"] </p>
+                    <input id="isciTekmovanje" type="text" class="form-control" placeholder="@Localizer["ime"]" />
+                    <button class="btn btn-primary mt-3" id="prikaziGrafEna">@Localizer["prikazi"]</button>
+                    <button class="btn btn-danger mt-3" id="skrijGrafEna" style="display: none;">@Localizer["hide"]</button>
+                    <canvas id="graf1" style="width: 100%;" class="mt-3"></canvas>
+                </div>
+            </div>
+
+            <div class="col-md-6 bordered">
+                <h4 class="mt-2">@Localizer["line"]</h4>
+                <p class="em">@Localizer["naLetoPon"] </p>
+                <div class="mb-2">
+                    <input id="isciTekGrafDva" type="text" class="form-control" placeholder="@Localizer["ime"]" />
+                </div>
+                
+                <button class="btn btn-primary mt-3" id="prikaziGrafDva">@Localizer["prikazi"]</button>
+                <button class="btn btn-danger mt-3" id="skrijGrafDva" style="display: none;">@Localizer["hide"]</button>
+                <canvas id="graf2" style="width: 100%;" class="mt-3"></canvas>
+            </div>
+
+
+            <div class="col-md-6 bordered">
+                <h4 class="mt-2">@Localizer["pie"]</h4>
+                <p class="em"> @Localizer["gledeNaLeto"]</p>
+                <div class="mb-2">
+                    <input id="isciTekGrafTri" type="text" class="form-control" placeholder="@Localizer["letoIzvedbe"]" />
+                </div>
+
+                <button class="btn btn-primary mt-3" id="prikaziGrafTri">@Localizer["prikazi"]</button>
+                <button class="btn btn-danger mt-3" id="skrijGraftri" style="display: none;">@Localizer["hide"]</button>
+                <canvas id="graf3" style="width: 100%;" class="mt-3"></canvas>
+
+            </div>
+
+            </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            $("#prikaziGrafEna").click(function () {
+
+                var imeTek = $("#isciTekmovanje").val();
+                if (imeTek == "") {
+                    alert(localizedStrings.obvestilo);
+                }
+                $("#skrijGrafEna").show();
+
+                $.ajax({
+                    url: '/Tekmovanja/prviGraf/' + imeTek,
+                    type: 'GET',
+                    dataType: 'json',
+
+                    success: function (response) {
+                        renderChart(response);
+                        console.log(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+
+            });
+
+            $("#skrijGrafEna").click(function () {
+                var existingChart = Chart.getChart("graf1");
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+                $("#skrijGrafEna").hide();
+            });
+
+            $("#prikaziGrafDva").click(function () {
+
+                var prvoTekmovanje = $("#isciTekGrafDva").val();
+                if (prvoTekmovanje == "") {
+                    alert(localizedStrings.obvestilo);
+                }
+                var drugoTekmovanje = $("#isciTekGrafDvaDva").val();
+                $("#skrijGrafDva").show();
+
+                $.ajax({
+                    url: '/Tekmovanja/DrugiGraf/' + prvoTekmovanje + "/" + drugoTekmovanje,
+                    type: 'GET',
+                    dataType: 'json',
+
+                    success: function (response) {
+                        renderChartSecond(response);
+                        console.log(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+
+            });
+
+            $("#skrijGrafDva").click(function () {
+                var existingChart = Chart.getChart("graf2");
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+                $("#skrijGrafDva").hide();
+            });
+
+
+            $("#prikaziGrafTri").click(function () {
+
+                var imeTek = $("#isciTekGrafTri").val();
+                if (imeTek == "") {
+                    alert(localizedStrings.obvestilo);
+                }
+                if (!$.isNumeric(imeTek) || imeTek.trim() === "") {
+                    alert(localizedStrings.obvestilo);
+                    return; 
+                }
+                $("#skrijGrafTri").show();
+
+                $.ajax({
+                    url: '/Tekmovanja/TretjiGraf/' + imeTek,
+                    type: 'GET',
+                    dataType: 'json',
+
+                    success: function (response) {
+                        renderChartThird(response);
+                        console.log(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+
+            });
+
+            $("#skrijGraftri").click(function () {
+                var existingChart = Chart.getChart("graf3");
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+                $("#skrijGraftri").hide();
+            });
+
+            function renderChart(data) {
+                var labels = Object.keys(data);
+                var values = Object.values(data);
+
+                var existingChart = Chart.getChart("graf1");
+
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+
+                var ctx = document.getElementById('graf1').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: localizedStrings.stPonovitev,
+                            data: values,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderChartSecond(data) {
+                var labels = Object.keys(data);
+                var values = Object.values(data);
+
+                var existingChart = Chart.getChart("graf2");
+
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+
+                var ctx = document.getElementById('graf2').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: localizedStrings.stPonovitev,
+                            data: values,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+
+            function renderChartThird(data) {
+                var labels = Object.keys(data);
+                var values = Object.values(data);
+
+                var existingChart = Chart.getChart("graf3");
+
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+
+                var ctx = document.getElementById('graf3').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: localizedStrings.stPonovitev,
+                            data: values,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            }
+
+
+
+
+        });
+    </script>
+</body>
+</html>

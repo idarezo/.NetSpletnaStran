@@ -1,0 +1,54 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Posodobi podatke";
+
+}
+
+
+@model ozra_vaje4.Models.UserViewModel
+<head>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+
+</head>
+<h1>@Localizer["PosodobiPodatke"]"</h1>
+<form id="registrationForm" method="post" asp-controller="Profil" asp-action="posodobiPodatke" class="customisedDivs" asp-route-id="@Model.Id">
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div>
+
+        <div class="form-group">
+            <label asp-for="ime" for="imeInput">@Localizer["ime"] :</label>
+            @Html.EditorFor(model => model.ime , new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="ime" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="priimek" for="priimekExample">@Localizer["priimek"] :</label>
+            @Html.EditorFor(model => model.priimek , new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="priimek" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="eNaslov" class="control-label">@Localizer["email"] :</label>
+            @Html.EditorFor(model => model.eNaslov , new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="eNaslov" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="geslo1" class="control-label">@Localizer["geslo1"] :</label>
+            @Html.EditorFor(model => model.geslo1 , new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="geslo1" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="geslo2" class="control-label">@Localizer["geslo2"] :</label>
+            @Html.EditorFor(model => model.geslo2, new { htmlAttributes = new { @class = "form-control" } })
+            <span asp-validation-for="geslo2" class="text-danger"></span>
+        </div>
+        <br />
+        <input type="submit" value=" @Localizer["change"]" class="btn btn-primary" />
+    </div>
+
+</form>

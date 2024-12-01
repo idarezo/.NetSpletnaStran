@@ -1,0 +1,263 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Vsa tekmovanja";
+}
+<script>
+    var localizedStrings = {
+        obvestilo: "@Localizer["ovestila"]",
+        
+
+    };
+</script>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Tekmovanja API</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+</head>
+<body>
+   
+    <br />
+    <br />
+
+    <h3><i>@Localizer["start"]</i></h3>
+    <br />
+
+
+     
+        <div class="row">
+            <div class="col-md-6">
+                <div>
+                <p class="em">@Localizer["podlagaImen"]</p>
+                     
+                    <input id="isciTekmovanje" type="text" class="form-control" placeholder="@Localizer["imeTek"]" />
+                <button class="btn btn-primary mt-3" id="isciTekmovanjeBtn">@Localizer["najdiTek"]</button>
+                <button class="btn btn-danger mt-3" id="skrijTekmovanjaIme" style="display: none;"> @Localizer["skrijTek"]</button>
+                    <div id="specificTekmovanjeDetails" style="width: 100%;" class="mt-3"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div>
+                <p class="em">@Localizer["podlagaLeta"]</p>
+                   
+                <input id="isciTekmovanjeDrzava" type="text" class="form-control" placeholder="@Localizer["letnica"]" />
+                <button class="btn btn-primary mt-3" id="isciTekmovanjeBtnDrzava">@Localizer["najdiTek"]</button>
+                <button class="btn btn-danger mt-3" id="skrijTekmovanjaDrzava" style="display: none;">@Localizer["skrijTek"]</button>
+
+                     <div id="specificTekmovanjeDrzava" class="mt-3" style="width: 100%;"></div>
+
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="row mt-6">
+            <div class="col-md-6"> 
+                <div>
+                <p class="em">@Localizer["podlagaDrzava"]</p>
+
+                <input id="isciTekmovanjetri" type="text" class="form-control" placeholder="@Localizer["imeDrz"]" />
+                <button class="btn btn-primary mt-3" id="isciTek">@Localizer["najdiTek"]</button>
+                <button class="btn btn-danger mt-3" id="isciTekDr" style="display: none;">@Localizer["skrijTek"]</button>
+                <div id="specTekDrz" class="mt-3" style="width: 100%;"></div>
+                </div>
+
+            </div>
+         
+
+            </div>
+       
+
+ 
+    <script>
+        $(document).ready(function () {
+
+            $("#submitBtnIzracun").click(function () {
+            
+                var imeTek = $("#input1").val();
+                var drTek = $("#input2").val();
+                var letoTek = $("#input3").val();
+                var cacheBuster = new Date().getTime();
+
+
+                $.ajax({
+                    url: "/Tekmovanja/tekmovanjaIzracun/" + imeTek + "/" + drTek + "/" + letoTek + "?_=" + cacheBuster,
+                    type: "GET",
+                    success: function (data) {
+                        console.log("Received data:", data);
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                    }
+                });
+            
+            });
+
+
+            $("#isciTek").click(function () {
+                var inputValue = $("#isciTekmovanjetri").val();
+                if (inputValue == "") {
+                    alert(localizedStrings.obvestilo);
+                }
+                var cacheBuster = new Date().getTime();
+
+                $.ajax({
+                    url: "/Tekmovanja/tekmovanjaDrz/" + inputValue + "?_=" + cacheBuster,
+                    type: "GET",
+                    success: function (data) {
+                        console.log("Received data:", data);
+                        $("#isciTekDr").show();
+
+
+                        var detailsDiv = $("#specTekDrz");
+                         detailsDiv.empty();
+
+                        var table = $("<table>").addClass("table customisedDivs");
+                        var tableHead = $("<thead>").appendTo(table);
+                        var tableBody = $("<tbody>").appendTo(table);
+
+                       var headers = ["Competition Name", "Foundation Year", "Country"];
+                       var headerRow = $("<tr>").appendTo(tableHead);
+
+                       headers.forEach(function (header) {
+                       $("<th>").text(header).appendTo(headerRow);
+                      });
+
+                      data.forEach(function (tekmovanje) {
+                     var row = $("<tr>").appendTo(tableBody);
+                     $("<td>").text(tekmovanje.ime_tekmovanja).appendTo(row);
+                     $("<td>").text(tekmovanje.leto_izvedbe).appendTo(row);
+                     $("<td>").text(tekmovanje.drzava).appendTo(row);
+                    });
+
+                    var div = $("<div>").addClass("col-md-6");
+                    div.append(table);
+                    detailsDiv.append(div);
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                    }
+                });
+
+                $("#isciTekmovanjetri").val("");
+            });
+
+            $("#isciTekDr").click(function () {
+                $("#specTekDrz").empty();
+                $(this).hide();
+            });
+
+
+            $("#isciTekmovanjeBtn").click(function () {
+                
+                var inputValue = $("#isciTekmovanje").val();
+                if(inputValue==""){
+                    alert(localizedStrings.obvestilo);
+                }
+                var cacheBuster = new Date().getTime();
+
+                $.ajax({
+                    url: "/Tekmovanja/specificnoEna/" + inputValue + "?_=" + cacheBuster,
+                    type: "GET",
+                    success: function (data) {
+                        console.log("Received data:", data);
+                        $("#skrijTekmovanjaIme").show();
+                        displayTekmovanjeDetails(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                    }
+                });
+
+                $("#isciTekmovanje").val("");
+            });
+
+            $("#skrijTekmovanjaIme").click(function () {
+                $("#specificTekmovanjeDetails").empty();
+                $(this).hide();
+            });
+
+            $("#isciTekmovanjeBtnDrzava").click(function () {
+                var inputValue = $("#isciTekmovanjeDrzava").val();
+                if (inputValue == "") {
+                    alert(localizedStrings.obvestilo);
+                }
+                console.log(inputValue);
+                var cacheBuster = new Date().getTime();
+
+                $("#skrijTekmovanjaDrzava").show();
+
+                $.ajax({
+                    url: "/Tekmovanja/specificnaDrzava/" + inputValue + "?_=" + cacheBuster,
+                    type: "GET",
+                    success: function (data) {
+                        $("#specificTekmovanjeDrzava").empty();
+                        $.each(data, function (index, item) {
+                            var commentDiv = $("<div>").addClass("rounded p-3 mb-3 border customisedDivs");
+
+                            var paragraph = $("<p>").text(item.ime_tekmovanja).css("font-style", "italic");
+                            var paragraphNovi = $("<p>").text(item.drzava).css("font-style", "italic");
+
+                            commentDiv.append(paragraph, paragraphNovi); 
+                            $("#specificTekmovanjeDrzava").append(commentDiv);
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                    }
+                });
+
+                $("#isciTekmovanjeDrzava").val("");
+            });
+
+            $("#skrijTekmovanjaDrzava").click(function () {
+                $("#specificTekmovanjeDrzava").empty();
+                $(this).hide();
+            });
+
+
+            function displayTekmovanjeDetails(data) {
+                var detailsDiv = $("#specificTekmovanjeDetails");
+                detailsDiv.empty();
+
+                var table = $("<table>").addClass("table customisedDivs");
+                var tableHead = $("<thead>").appendTo(table);
+                var tableBody = $("<tbody>").appendTo(table);
+
+                var headers = ["Competition Name", "Foundation Year", "Country"];
+                var headerRow = $("<tr>").appendTo(tableHead);
+
+                headers.forEach(function (header) {
+                    $("<th>").text(header).appendTo(headerRow);
+                });
+
+                data.forEach(function (tekmovanje) {
+                    var row = $("<tr>").appendTo(tableBody);
+                    $("<td>").text(tekmovanje.ime_tekmovanja).appendTo(row);
+                    $("<td>").text(tekmovanje.leto_izvedbe).appendTo(row);
+                    $("<td>").text(tekmovanje.drzava).appendTo(row);
+                });
+
+                var div = $("<div>").addClass("col-md-6");
+                div.append(table);
+                detailsDiv.append(div);
+            }
+
+           
+        });
+
+
+        
+    </script>
+</body>
+</html>
+

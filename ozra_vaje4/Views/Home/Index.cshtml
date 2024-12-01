@@ -1,0 +1,113 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Aplikacija za triatlon";
+}
+   <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+       <style>
+    #info {
+        background-color: #c5d8e9; ; 
+        border-radius: 10px; 
+        margin-top: 20px; 
+        padding: 10px; 
+    }
+
+    #info ul {
+        list-style-type: none; 
+        padding: 0; 
+        margin: 0; 
+    }
+
+    #info li {
+        margin-left: 0; 
+    }
+                    #najTekmeciContainer {
+            padding-left: 5; 
+            list-style-type: none; 
+            margin-top: 20px;
+            border: 1px solid #999; 
+            border-radius: 5px; 
+        }
+        </style>
+    </head>
+<div class="text-center">
+    @if (User.IsInRole("Uporabnik"))
+    {
+       
+        <h3><i>@Localizer["Welcome"]</i></h3>
+
+        <div id="info">
+            <h5>@Localizer["Navodila"]</h5>
+        <ul >
+            <li>
+                    <i>@Localizer["Tekmovanja"]</i>: @Localizer["NavodilaEna"]
+            </li>
+            <li>
+                    <i>@Localizer["NavodilaDva"]</i>: @Localizer["NavodilaTri"]
+            </li>
+
+            <li>
+                    <i>@Localizer["Statistika"]</i>: @Localizer["NavodilaStiri"]
+            </li>
+
+            <li>
+                    <i>@Localizer["Rezultati"]</i>: @Localizer["NavodilaPet"]
+            </li>
+        </ul>
+           
+
+            <button id="btnNajTek"class="btn btn-light mt-2">
+              <i>@Localizer["BtnOne"]  </i>
+            </button>
+        </div>
+
+      <div class ="row">
+          <div class="col-md-6">
+                <div id="najTekmeciContainer">
+
+                </div>
+            </div>
+
+      </div>
+    }
+    else
+    {
+        <h3><i>@Localizer["LogIn"]</i></h3>
+        <p><i>@Localizer["LogInSub"]</i></p>
+
+    }
+</div>
+<script>
+    $(document).ready(function () {
+
+        $("#btnNajTek").click(function () {
+
+            $.ajax({
+                url: "/Tekmovanja/NajTekmeci",
+                type: "GET",
+                success: function (data) {
+                    
+                    $("#najTekmeciContainer").empty();
+
+                    
+                    $("#najTekmeciContainer").empty();
+                    var list = $("<ul>").addClass("list-group list-group-flush");
+                    data.forEach(function (item) {
+                        var listItem = $("<li>").addClass("list-group-item").text(item);
+                        list.append(listItem);
+                    });
+                    $("#najTekmeciContainer").append(list);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data:", error);
+                    console.log(xhr.responseText);
+                }
+            });
+        
+        
+        });
+    
+    });
+</script>

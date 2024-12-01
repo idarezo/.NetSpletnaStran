@@ -1,0 +1,59 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+
+@model ozra_vaje4.Models.AccountViewModel
+@inject IViewLocalizer Localizer
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .form-container {
+            border: 3px solid #add8e6;
+            border-radius: 5px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+
+    <title>@Localizer["Login"]:</title>
+</head>
+
+<body>
+    <div class="form-container">
+        <form asp-controller="Account" asp-action="LogInUser" method="post">
+
+            <div class="form-group">
+                <label class="control-label">@Localizer["Email"]</label>
+                <input asp-for="Email" class="form-control">
+                <span asp-validation-for="Email" class="text-danger"></span>
+                @if (ViewData.ModelState["enaslov"] != null)
+                {
+                    <div class="text-danger">
+                        @Html.ValidationMessage("enaslov")
+                    </div>
+                }
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="Password" class="control-label">@Localizer["Password"]</label>
+                <input asp-for="Password" class="form-control">
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input class="btn btn-primary mt-2" type="submit" value=" @Localizer["test"]" />
+               
+            </div>
+            <br />
+
+        </form>
+
+
+    </div>
+</body>
+
+
+</html>
